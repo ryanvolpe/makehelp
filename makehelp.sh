@@ -96,7 +96,7 @@ parse_makefile ()
             declare -a buf
         fi
     done
-    if (( "${_INJECT_MAKEHELP:-}" == 0 )); then
+    if (( "${_INJECT_MAKEHELP:-1}" == 0 )); then
         # dirty hack time!
         # if --static, there *should* be no makehelp target defined.
         # let's inject it now...
