@@ -1,4 +1,4 @@
-# makehelp
+# makehelp [![Build Status](https://travis-ci.org/ryanvolpe/makehelp.svg?branch=master)](https://travis-ci.org/ryanvolpe/makehelp)
 Generates help documentation from embedded comments in a Makefile
 
 ## Example
