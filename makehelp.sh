@@ -123,12 +123,12 @@ for line in $(parse_makefile "$MAKEFILE"); do
     doc=$(echo "$line" | awk -F$'\1' '{print $2}')
     doc="$(format_doc $doc)"
     if [ -n "$target" ]; then
-        targets=( "${targets[@]}" "$target" )
+        targets=( "${targets[@]-}" "$target" )
         key="doc_$(echo $target | tr '-' '_')"
         declare $key="$doc"
         (( ${#target} > $maxlen )) && maxlen=${#target}
     else
-        general=( "${general[@]}" "$doc" )
+        general=( "${general[@]-}" "$doc" )
     fi
 done
 
@@ -140,7 +140,7 @@ for doc in ${general[@]-}; do
 done
 echo "Targets:"
 
-for target in $(sort <<<"${targets[*]}"); do
+for target in $(sort <<<"${targets[*]-}"); do
 #for target in ${targets[@]}; do
     key="doc_$(echo $target | tr '-' '_')"
     doc="${!key}"
