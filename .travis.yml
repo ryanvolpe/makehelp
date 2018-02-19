@@ -5,6 +5,4 @@ os:
   - osx
 
 script:
-  - |
-    ./makehelp.sh tests/makefiles/simple.mk
-    bats tests/ 
+  - bats tests/ 
