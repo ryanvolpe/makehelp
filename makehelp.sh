@@ -76,7 +76,7 @@ parse_makefile ()
                 declare -a buf
                 in_doc=0
             fi
-            buf=( "${buf[@]}" "${stripped#"${stripped%%[![:space:]]*}"}" )
+            buf=( "${buf[@]-}" "${stripped#"${stripped%%[![:space:]]*}"}" )
         elif [[ "$line" =~ $decl ]]; then
             if (( $in_doc == 0 )); then
                 printf "${BASH_REMATCH[1]}"
@@ -134,7 +134,7 @@ done
 
 echo "Usage: make [TARGETS]"
 echo
-for doc in ${general[@]}; do
+for doc in ${general[@]-}; do
     echo -e ' ' "$doc"
     echo
 done
