@@ -5,4 +5,4 @@ os:
   - osx
 
 script:
-  - make test
+  - bats tests/ 
