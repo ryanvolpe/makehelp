@@ -34,6 +34,11 @@ while (( "$#" )); do
             ;;
 
         *)
+            if [[ -n "$MAKEFILE" ]]; then
+                echo "Error: Makefile already specified." >&2
+                echo "Usage: $0 [OPTIONS] <Makefile>" >&2
+                exit 2
+            fi
             MAKEFILE="$arg"
             ;;
     esac
