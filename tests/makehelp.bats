@@ -13,7 +13,6 @@ MAKEFILES="$BATS_TEST_DIRNAME/makefiles"
     run ./makehelp.sh
     [ "$status" -ne 0 ]
     [ "${#lines[@]}" -eq 2 ]
-    skip "currently failing"
     run ./makehelp.sh one two
     [ "$status" -ne 0 ]
     [ "${#lines[@]}" -eq 2 ]
