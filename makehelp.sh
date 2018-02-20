@@ -133,16 +133,13 @@ done
 echo "Usage: make [TARGETS]"
 echo
 for doc in "${general[@]-}"; do
-    [[ -z "$doc" ]] && continue
     echo -e ' ' "$doc"
     echo
 done
 echo "Targets:"
 
-#while IFS= read -r target; do
 # shellcheck disable=SC2013
 for target in $(sort <<<"${targets[*]-}"); do
-#for target in ${targets[@]}; do
     key="doc_$(echo "$target" | tr '-' '_')"
     doc="${!key}"
     (( outlen=${#target} ))
