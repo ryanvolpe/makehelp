@@ -55,10 +55,10 @@ localdeps:
 	$(MAKE) "$(kcov)" "$(bats)"
 
 $(kcov):
-	$(MAKE) $(DEP_BUILDROOT)/kcov-build
+	$(MAKE) "$(DEP_BUILDROOT)/kcov-build"
 	@echo "$(INFO) Installing kcov to package cache."
 	$(INSTALL) -d "$(@D)"
-	$(INSTALL_PROGRAM) "$</src/kcov" "$@"
+	$(INSTALL_PROGRAM) "$(DEP_BUILDROOT)/kcov-build/src/kcov" "$@"
 	rm -rf "$(DEP_BUILDROOT)"
 
 $(bats):
@@ -99,6 +99,7 @@ $(DEP_BUILDROOT)/kcov-%: GITHUB_REPO = SimonKagstrom/kcov
 $(DEP_BUILDROOT)/bats-%: GITHUB_REPO = bats-core/bats-core
 $(DEP_BUILDROOT)/bats-%: BATS_ROOT = $(DEP_BUILDROOT)/bats-src
 $(DEP_BUILDROOT)/bats-%: BATS_VERSION = $(shell cat $(DEP_BUILDROOT)/bats-version)
+$(DEP_BUILDROOT)/kcov-%: KCOV_VERSION = $(shell cat $(DEP_BUILDROOT)/kcov-version)
 
 $(DEP_BUILDROOT)/%-src: DEP_VERSION = $(shell cat $(DEP_BUILDROOT)/$*-version)
 $(DEP_BUILDROOT)/%-src: $(DEP_BUILDROOT)/%-version
@@ -122,20 +123,20 @@ $(DEP_BUILDROOT)/bats-build: $(DEP_BUILDROOT)/bats-test
 	touch "$<"
 	ln -s "bats-src" "$@"
 
-$(DEP_BUILDROOT)/kcov-build: DEP_VERSION=$(shell cat $(DEP_BUILDROOT)/kcov-version)
-$(DEP_BUILDROOT)/kcov-build: $(DEP_BUILDROOT)/kcov-src
-	@echo "$(INFO) Building kcov@$(DEP_VERSION)..."
+$(DEP_BUILDROOT)/kcov-test: $(DEP_BUILDROOT)/kcov-src
+	@echo "$(INFO) Testing kcov@$(KCOV_VERSION)"
 	# hijack kcov's travis infrastructure for running tests...
-	$(INSTALL) -d "$@"
-	# defer to Travis; if os is set, use that
 	if [ ! -n "$(TRAVIS_OS_NAME)" ]; then \
-		if [[ "$$(uname -s)" = "Darwin" ]]; then \
+		if [ "$$(uname -s)" = "Darwin" ]; then \
 			KCOV_MAKE_ARGS="TRAVIS_OS_NAME=osx CC=clang"; \
 		else \
 			KCOV_MAKE_ARGS="TRAVIS_OS_NAME=linux CC=gcc"; \
 		fi \
 	fi \
-	&& cd "$<" \
-		&& make -f "travis/Makefile" $$KCOV_MAKE_ARGS prepare_environment run-tests \
-		|| rm -rf "$@" \
-		&& ln -s "$(realpath $<)/build" "$@"
+	&& cd "$<" && $(MAKE) -f "travis/Makefile" $$KCOV_MAKE_ARGS prepare_environment run-tests \
+		|| (echo "$(ERROR) Tests failed!" && exit 1)
+
+$(DEP_BUILDROOT)/kcov-build: $(DEP_BUILDROOT)/kcov-test
+	@echo "$(INFO) Finalizing build of kcov@$(KCOV_VERSION)..."
+	touch "$<"		# kcov-test succeeded, make sure it doesn't run again
+	ln -sf "$(realpath $(DEP_BUILDROOT)/kcov-src)/build" "$@"
